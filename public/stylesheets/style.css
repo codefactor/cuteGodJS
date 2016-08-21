@@ -1,6 +1,18 @@
-.cplanet-world {
-    position: 'relative';
+.cutePlanet .viewport {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
-.cplanet-element {
+
+.cutePlanet .world {
+    top: 200px;
+}
+
+.cutePlanet .tile,
+.cutePlanet .block,
+.cutePlanet .world {
     position: absolute;
 }
