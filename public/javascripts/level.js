@@ -1,5 +1,5 @@
-var level = (function ($) {
-    var data = {
+var level = (function($) {
+    var DATA = {
         '0,0': {
             0: {
                 0: [2, 3, 4, 16],
@@ -57,7 +57,7 @@ var level = (function ($) {
     };
 
     return {
-        getBlocksAround: function (tz, tx, bz, bx, by) {
+        getBlocksAround: function(tz, tx, bz, bx, by) {
             var blocks = {};
             for (var z = -1; z <= 1; z++) {
                 var bzc = bz + z;
@@ -73,14 +73,14 @@ var level = (function ($) {
                     blocks[z][x] = {};
                     for (var y = -1; y <= 1; y++) {
                         var byc = by + y;
-                        var b = blocks[z][x][y] = {empty: true};
-                        var block = data[tzc + ',' + txc];
+                        var block = DATA[tzc + ',' + txc];
                         if (!block) {
                             block = [2, 3, 4];
                         } else {
                             block = block && block[bzc];
                             block = block && block[bxc];
                         }
+                        blocks[z][x][y] = 0;
                         block = block && block[byc];
                         if (block) {
                             if (!$.isArray(block)) {
@@ -89,9 +89,10 @@ var level = (function ($) {
                             var info = meta.blocks[block[0]];
                             var state = info && info.states[block[1]];
                             if (info && state) {
-                                b.empty = false;
-                                b.info = info;
-                                b.state = state;
+                                blocks[z][x][y] = {
+                                    info: info,
+                                    state: state
+                                };
                             }
                         }
                     }
