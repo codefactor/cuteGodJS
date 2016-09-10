@@ -34,15 +34,20 @@
                     var placed = shadow.placed;
                     var none = shadow.none;
                     placed = blocks[placed[0]][placed[1]][placed[2]];
-                    none = none && blocks[none[0]][none[1]][none[2]];
-                    if (placed && placed.info.shadow && !none) {
-                        $('<img ondragstart="return false">').attr({
-                            src: meta.imagePrefix + shadow.imageSrc
-                        }).css({
-                            position: 'absolute',
-                            top: '0',
-                            left: '0'
-                        }).appendTo($block);
+                    if (placed && placed.info.shadow) {
+                        var noblock = 0;
+                        for (var j = 0; !noblock && j < none.length; j++) {
+                            noblock = noblock || blocks[none[j][0]][none[j][1]][none[j][2]];
+                        }
+                        if (!noblock) {
+                            $('<img ondragstart="return false">').attr({
+                                src: meta.imagePrefix + shadow.imageSrc
+                            }).css({
+                                position: 'absolute',
+                                top: '0',
+                                left: '0'
+                            }).appendTo($block);
+                        }
                     }
                 });
             }
@@ -50,7 +55,7 @@
     }
 
     tile(0, 0);
-    tile(-1, 0);
-    tile(-1, -1);
-    tile(0, -1);
+    // tile(-1, 0);
+    // tile(-1, -1);
+    // tile(0, -1);
 })(jQuery);

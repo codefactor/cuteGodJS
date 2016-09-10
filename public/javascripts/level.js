@@ -63,13 +63,13 @@ var level = (function($) {
                 var bzc = bz + z;
                 var bzd = Math.floor(bzc / meta.tileDepth);
                 var tzc = tz + bzd;
-                bzc += bzd * meta.tileDepth;
+                bzc = (bzc + meta.tileDepth) % meta.tileDepth;
                 blocks[z] = {};
                 for (var x = -1; x <= 1; x++) {
                     var bxc = bx + x;
                     var bxd = Math.floor(bxc / meta.tileWidth);
                     var txc = tx + bxd;
-                    bzc += bzd * meta.tileDepth;
+                    bxc = (bxc + meta.tileWidth) % meta.tileWidth;
                     blocks[z][x] = {};
                     for (var y = -1; y <= 1; y++) {
                         var byc = by + y;
