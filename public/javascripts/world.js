@@ -30,7 +30,21 @@
                 $('<img ondragstart="return false">').attr({
                     src: meta.imagePrefix + data.state.imageSrc
                 }).appendTo($block);
-                // TODO: Shadows
+                data.info.shadow && $.each(meta.shadows, function(i, shadow) {
+                    var placed = shadow.placed;
+                    var none = shadow.none;
+                    placed = blocks[placed[0]][placed[1]][placed[2]];
+                    none = none && blocks[none[0]][none[1]][none[2]];
+                    if (placed && placed.info.shadow && !none) {
+                        $('<img ondragstart="return false">').attr({
+                            src: meta.imagePrefix + shadow.imageSrc
+                        }).css({
+                            position: 'absolute',
+                            top: '0',
+                            left: '0'
+                        }).appendTo($block);
+                    }
+                });
             }
         });
     }
