@@ -2,47 +2,10 @@ var meta = {
     imagePrefix: '/images/PlanetCute PNG/',
     tileWidth: 8,
     tileDepth: 8,
-    tileHeight: 20,
+    tileHeight: 8,
     blockDepth: 80,
     blockWidth: 100,
     blockHeight: 41,
-    shadows: [{
-        imageSrc: 'Shadow South.png',
-        placed: [1, 0, 1],
-        none: [[0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow South West.png',
-        placed: [1, -1, 1],
-        none: [[0, 1, 1], [0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow West.png',
-        placed: [0, -1, 1],
-        none: [[0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow North West.png',
-        placed: [-1, -1, 1],
-        none: [[-1, 0, 1], [0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow North.png',
-        placed: [-1, 0, 1],
-        none: [[0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow North East.png',
-        placed: [-1, 1, 1],
-        none: [[-1, 0, 1], [0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow East.png',
-        placed: [0, 1, 1],
-        none: [[0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow South East.png',
-        placed: [1, 1, 1],
-        none: [[0, 1, 1], [0, 0, 1]]
-    }, {
-        imageSrc: 'Shadow Side West.png',
-        placed: [1, -1, 0],
-        none: [[1, 0, 0]]
-    }],
     blocks: {
         1: {
             name: 'Plain',
@@ -241,5 +204,42 @@ var meta = {
                 edgeHeights: [1, 1, 1, 1]
             }]
         }
-    }
+    },
+    shadows: [{
+        imageSrc: 'Shadow South.png',
+        placed: [1, 0, 1],
+        none: [[0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow South West.png',
+        placed: [1, -1, 1],
+        none: [[0, 1, 1], [0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow West.png',
+        placed: [0, -1, 1],
+        none: [[0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow North West.png',
+        placed: [-1, -1, 1],
+        none: [[-1, 0, 1], [0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow North.png',
+        placed: [-1, 0, 1],
+        none: [[0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow North East.png',
+        placed: [-1, 1, 1],
+        none: [[-1, 0, 1], [0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow East.png',
+        placed: [0, 1, 1],
+        none: [[0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow South East.png',
+        placed: [1, 1, 1],
+        none: [[0, 1, 1], [0, 0, 1]]
+    }, {
+        imageSrc: 'Shadow Side West.png',
+        placed: [1, -1, 0],
+        none: [[1, 0, 0]]
+    }]
 };

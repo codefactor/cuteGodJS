@@ -4,10 +4,11 @@ var http = require('http').Server(app);
 
 app.set('port', (process.env.PORT || 5000));
 
-//var io = require('socket.io')(http);
-//io.on('connection', function(socket) {
-//	socket.emit('world init', metadata);
-//});
+var io = require('socket.io')(http);
+io.on('connection', function(socket) {
+    socket.on('watch location', function(minTz, maxTz, minTx, maxTx) {
+    });
+});
 
 app.use(express.static('public'));
 

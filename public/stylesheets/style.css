@@ -1,18 +1,20 @@
+.cutePlanet .tile,
+.cutePlanet .block,
+.cutePlanet .world,
+.cutePlanet .shadow,
+.cutePlanet .viewport {
+    position: absolute;
+}
+
 .cutePlanet .viewport {
     overflow: hidden;
-    position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
 }
 
-.cutePlanet .world {
-    top: 200px;
-}
-
-.cutePlanet .tile,
-.cutePlanet .block,
-.cutePlanet .world {
-    position: absolute;
+.cutePlanet .shadow {
+	top: 0;
+	left: 0;
 }
