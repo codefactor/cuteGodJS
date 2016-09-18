@@ -212,7 +212,7 @@ var meta = {
     }, {
         imageSrc: 'Shadow South West.png',
         placed: [1, -1, 1],
-        none: [[0, 1, 1], [0, 0, 1]]
+        none: [[0, 1, 1], [0, 0, 1], [0, -1, 1]]
     }, {
         imageSrc: 'Shadow West.png',
         placed: [0, -1, 1],
@@ -220,7 +220,7 @@ var meta = {
     }, {
         imageSrc: 'Shadow North West.png',
         placed: [-1, -1, 1],
-        none: [[-1, 0, 1], [0, 0, 1]]
+        none: [[-1, 0, 1], [0, 0, 1], [0, -1, 1]]
     }, {
         imageSrc: 'Shadow North.png',
         placed: [-1, 0, 1],

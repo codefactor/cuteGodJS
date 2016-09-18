@@ -1,22 +1,37 @@
 (function($) {
-    renderTile(0, 0);
-
     var socket = io();
+    var levelData;
 
-    socket.on('levelData', function(levelData) {
-        $.extend(level, levelData);
+    socket.on('levelData', function(data) {
+        levelData = data;
     });
 
-    socket.emit('watch', -1, 1, -1, 1);
+    var $window = $(window);
+    var $viewport = $('<div></div>').css({position: 'absolute', overflow: 'hidden', top: 0, right: 0, bottom: 0, left: 0}).appendTo('body');
+    var $world = $('<div></div>').css({position: 'absolute'}).appendTo($viewport);
+
+    centerWorld();
+    renderTile(0, 0);
+    $window.resize(centerWorld);
+
+    function centerWorld() {
+        var width = $window.width();
+        var height = $window.height();
+        $world.css({
+            top: (height/2) - (meta.blockDepth*meta.tileDepth/2) + 'px',
+            left: (width/2) - (meta.blockWidth*meta.tileWidth/2) + 'px'
+        });
+    }
 
     function renderTile(tz, tx) {
-        $('<div class="tile"></div>').attr({
+        $('<div></div>').attr({
             id: tz + '-' + tx
         }).css({
             zIndex: tz,
+            position: 'absolute',
             top: tz * meta.blockDepth * meta.tileDepth + 'px',
             left: tx * meta.blockWidth * meta.tileWidth + 'px'
-        }).appendTo('#world');
+        }).appendTo($world);
         for (var bz = 0; bz < meta.tileDepth; bz++) {
             for (var bx = 0; bx < meta.tileWidth; bx++) {
                 for (var by = 0; by < meta.tileHeight; by++) {
@@ -30,10 +45,11 @@
         level.getBlocksAround(tz, tx, bz, bx, by).then(function(blocks) {
             var data = blocks[0][0][0];
             if (data) {
-                var $block = $('<div class="block"></div>').attr({
+                var $block = $('<div></div>').attr({
                     id: tz + '-' + tx + '-' + bz + '-' + bx + '-' + by
                 }).css({
                     zIndex: bz * meta.tileWidth * meta.tileHeight + bx * meta.tileHeight + by,
+                    position: 'absolute',
                     top: bz * meta.blockDepth - by * meta.blockHeight + 'px',
                     left: bx * meta.blockWidth + 'px'
                 }).appendTo('#' + tz + '-' + tx);
@@ -41,8 +57,12 @@
                     src: meta.imagePrefix + data.state.imageSrc
                 }).appendTo($block);
                 $.each(getShadows(blocks), function(i, shadow) {
-                    $('<img ondragstart="return false" class="shadow">').attr({
+                    $('<img ondragstart="return false">').attr({
                         src: meta.imagePrefix + shadow.imageSrc
+                    }).css({
+                        position: 'absolute',
+                        top: 0,
+                        left: 0
                     }).appendTo($block);
                 });
             }
