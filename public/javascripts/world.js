@@ -1,6 +1,14 @@
 (function($) {
     renderTile(0, 0);
 
+    var socket = io();
+
+    socket.on('levelData', function(levelData) {
+        $.extend(level, levelData);
+    });
+
+    socket.emit('watch', -1, 1, -1, 1);
+
     function renderTile(tz, tx) {
         $('<div class="tile"></div>').attr({
             id: tz + '-' + tx
