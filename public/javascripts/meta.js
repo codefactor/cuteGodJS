@@ -7,6 +7,13 @@ var meta = {
     blockWidth: 100,
     blockHeight: 41,
     blocks: {
+        '-1': {
+            name : 'Selector',
+            shadow : false,
+            states : [{
+                imageSrc: 'Selector.png'
+            }]
+        },
         1: {
             name: 'Plain',
             shadow: true,
@@ -202,6 +209,25 @@ var meta = {
                 name: 'Orange',
                 imageSrc: 'Gem Orange.png',
                 edgeHeights: [1, 1, 1, 1]
+            }]
+        },
+        18: {
+            name: 'Character',
+            states: [{
+                name: 'Boy',
+                imageSrc: 'Character Boy.png'
+            }, {
+                name: 'Cat Girl',
+                imageSrc: 'Character Cat Girl.png'
+            }, {
+                name: 'Horn Girl',
+                imageSrc: 'Character Horn Girl.png'
+            }, {
+                name: 'Pink Girl',
+                imageSrc: 'Character Pink Girl.png'
+            }, {
+                name: 'Princess Girl',
+                imageSrc: 'Character Princess Girl.png'
             }]
         }
     },
