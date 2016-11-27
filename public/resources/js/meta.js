@@ -1,5 +1,5 @@
 var meta = {
-    imagePrefix: '/images/PlanetCute PNG/',
+    imagePrefix: '/resources/img/PlanetCute/',
     tileWidth: 8,
     tileDepth: 8,
     tileHeight: 8,
