@@ -105,9 +105,11 @@
 		$(window).resize(resize);
 		resize();
 
-        track(images.level(meta)).done(function(images) {
+        var imagePromise = images.level(meta).done(function(images) {
             meta.images = images;
-            // Render the scene
         });
+
+        // show a progress bar while images are loading
+        $('body').progressbar(imagePromise);
 	});
 })(jQuery);

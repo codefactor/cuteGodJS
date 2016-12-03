@@ -1,7 +1,7 @@
 /*\
 |*| Progress Bar
 \*/
-#progress {
+.progress {
 	position: fixed;
 	top: 0; left: 0; bottom: 0; right: 0;
 	width: 200px;
@@ -9,12 +9,12 @@
 	border: 1px solid black;
 	margin: auto;
 }
-#progress .bar {
+.progress .bar {
 	height: 100%;
 	background-color: blue;
 	display: block;
 }
-#progress .message {
+.progress .message {
 	display: block;
 	font-family: Arial, Helvetica, sans-serif;
 	word-wrap: break-word;
