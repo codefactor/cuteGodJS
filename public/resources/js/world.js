@@ -1,115 +1,118 @@
-(function($) {
-	"use strict";
+$(function() {
+    "use strict";
 
-    var DATA = {
-        '0,0': {
-            0: {
-                0: [2, 3, 4],
-                1: [2, 3, 4],
-                2: [2, 3, 4, 9],
-                3: [2, 2, 2, 11, 11, [7, 7]],
-                4: [2, 2, 6, 0, 0, [7, 0]],
-                5: [2, 2, 2, 11, 11, [7, 1]],
-                6: [2, 3, 4],
-                7: [2, 3, 4]
-            },
-            1: {
-                0: [2, 3, 4],
-                1: [2, 3, 4],
-                2: [2, 3, 4, 10],
-                3: [2, 2, 2, 11, 11, [7, 6]],
-                4: [2, 2, 6, 0, 0, 11],
-                5: [2, 2, 2, 11, 11, [7, 2]],
-                6: [2, 3, 4],
-                7: [2, 3, 4]
-            },
-            2: {
-                0: [2, 3, 4],
-                1: [2, 3, 5],
-                2: [2, 3, 5],
-                3: [2, 2, 2, 11, 11, [7, 5]],
-                4: [2, 2, 6, [13, 0], 0, [7, 4]],
-                5: [2, 2, 2, 11, 11, [7, 3]],
-                6: [2, 3, 4, -1, 0, 0, [18, 1]],
-                7: [2, 3, 4]
-            },
-            3: {
-                0: [2, 3, 4],
-                1: [2, 3, 5],
-                2: [2, 3, 5],
-                3: [2, 3, 4],
-                4: [2, 2, 2],
-                5: [2, 2, 2],
-                6: [2, 3, 3],
-                7: [2, 3, 3]
-            },
-            4: {
-                0: [2, 3, 4],
-                1: [2, 3, 4],
-                2: [2, 3, 4],
-                3: [2, 3, 4],
-                4: [2, 2, 2],
-                5: [2, 3, 3],
-                6: [2, 3, 3],
-                7: [2, 3, 3]
-            },
-            5: {
-                0: [1, 1, 2],
-                1: [2],
-                2: [2],
-                3: [2],
-                4: [2, 2, [8, 2]],
-                5: [2],
-                6: [2],
-                7: [2]
-            },
-            6: {
-                0: [2, 1, [8, 2]],
-                1: [2],
-                2: [2],
-                3: [2],
-                4: [2, [8, 2]],
-                5: [2],
-                6: [2],
-                7: [2]
-            },
-            7: {
-                0: [2, 2],
-                1: [2, [8, 1]],
-                2: [2],
-                3: [2],
-                4: [2],
-                5: [2],
-                6: [2],
-                7: [2]
+    var socket, world, container = $('body');
+
+    function initTile(tile, data) {
+        var tiles = $('<div></div>').css({
+            position: 'relative'
+        }).appendTo(container);
+        var tile = createTile(tile, data).css({
+            position: 'absolute',
+            top: 0, left: 0
+        });
+        tile.appendTo(tiles);
+        var tile2 = createTile(tile, data).css({
+            position: 'absolute',
+            top: (world.tileDepth * world.blockDepth) + 'px',
+            left: 0
+        });
+        tile2.appendTo(tiles);
+    }
+
+    function createTile(tile, data) {
+        var canvas = $('<canvas></canvas>').attr({
+            width: (world.tileWidth * world.blockWidth),
+            height: (world.tileDepth * world.blockDepth + world.blockHeight * world.tileHeight)
+        });
+        var ctx = canvas[0].getContext('2d');
+        for (var bz=0; bz<world.tileDepth; bz++) {
+            var slice = data[bz];
+            if (!slice) continue;
+            for (var bx=0; bx<world.tileWidth; bx++) {
+                var column = slice[bx];
+                if (!column) continue;
+                for (var by=0, h=Math.min(world.tileHeight, column.length); by<h; by++) {
+                    var block = column[by];
+                    var state = 0;
+                    if ($.isArray(block)) {
+                        state = block[1];
+                        block = block[0];
+                    }
+                    block = world.blocks[block];
+                    state = block && block.states[state];
+                    var image = state && world.images[world.imagePrefix + state.imageSrc];
+                    if (!image) continue;
+                    var lEdge = bx * world.blockWidth;
+                    var bEdge = (bz+1) * world.blockDepth + (world.tileHeight-by) * world.blockHeight;
+                    ctx.drawImage(image, lEdge, bEdge - image.height);
+                }
             }
         }
-    };
+        return $('<div></div>').append(canvas);
+    }
 
-	$(function() {
-		function resize() {
-			canvas.css({
-				width: $(window).width() + 'px',
-				height: $(window).height() + 'px'
-			});
-		}
+    function loadImages(srcArray) {
+        var dfd = $.Deferred();
+        var images = {};
+        var srcLength = srcArray.length;
+        if (srcLength > 0) {
+            var completed = 0;
+            $.each(srcArray, function(i, src) {
+                function done() {
+                    completed++;
+                    dfd.notify(completed, srcLength, 'Downloading Image: [' + completed + ' of ' + srcLength + '] ' + src);
+                    if (completed == srcLength) {
+                        dfd.resolve(images);
+                    }
+                }
+                var image = new Image();
+                image.onload = function() {
+                    images[src] = image;
+                    done();
+                };
+                image.onerror = function() {
+                    dfd.reject('Error downloading: ' + src);
+                };
+                image.src = src;
+            });
+        } else {
+            dfd.resolve(images);
+        }
+        return dfd.promise();
+    }
 
-		var body = $('body').css('overflow', 'hidden');
-		var canvas = $('<canvas></canvas>').css({
-			position: 'absolute',
-			top: 0, left: 0,
-			zIndex: 1
-		}).appendTo(body);
-		var ctx = canvas[0].getContext('2d');
-
-		$(window).resize(resize);
-		resize();
-
-        var imagePromise = images.level(meta).done(function(images) {
-            meta.images = images;
+    function getImageSrcArray() {
+        function add(i, state) {
+            var src = world.imagePrefix + state.imageSrc;
+            if (srcFound[src] !== true) {
+                srcFound[src] = true;
+                srcArray.push(src);
+            }
+        }
+        var srcArray = [];
+        var srcFound = {};
+        $.each(world.shadows, add);
+        $.each(world.blocks, function(id, block) {
+            $.each(block.states, add);
         });
+        return srcArray;
+    }
 
-        // show a progress bar while images are loading
-        $('body').progressbar(imagePromise);
-	});
-})(jQuery);
+    function init() {
+        socket = io();
+        socket.on('tile init', initTile);
+        socket.emit('watch', '0,0');
+    }
+
+    $.ajax('/resources/content/world.json').done(function(response) {
+        world = response;
+        container.progressbar(loadImages(getImageSrcArray()).then(function(images) {
+            world.images = images;
+            init();
+            return 'Finished!';
+        }));
+    }).fail(function() {
+        alert('Fatal error loading content');
+    });
+});

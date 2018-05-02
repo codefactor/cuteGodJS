@@ -2,13 +2,16 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = process.env.PORT || 5000;
-var level = require('./levels/main');
+var fs = require('fs');
+var tiles = JSON.parse(fs.readFileSync('./levels/test.json', 'utf8'));
 
 var io = require('socket.io')(http);
 io.on('connection', function(socket) {
 	console.log('Socket connected: ' + socket.id);
 
-	socket.on('get', function(z, x) {
+	socket.on('watch', function(tile) {
+		console.log(socket.id + ' requested to watch tile: ' + tile);
+		socket.emit('tile init', tile, tiles[tile]);
 	});
 
     socket.on('disconnect', function() {

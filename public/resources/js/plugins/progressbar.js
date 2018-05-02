@@ -15,6 +15,19 @@
 	 * @constructor
 	 */
 	function Tracker($this) {
+		function fadeAway() {
+			setTimeout(function(){
+				if (fadingAway) {
+					$('.progress', $this).fadeOut(function() {
+						if (fadingAway) {
+							$('.progress', $this).remove();
+							fadingAway = false;
+						}
+					});
+				}
+			}, 100);
+		}
+
 		/**
 		 * Called anytime the promise has progress, or completes.
 		 * @inner
@@ -24,11 +37,15 @@
 				total = 0, 
 				message = 0, 
 				messageId = 0,
-				finished = true;
+				finished = true,
+				failed = false;
 
 			// determine the aggregate state of all tracked progress
 			$.each(tracker, function(id, progress) {
 				if (progress.finished) {
+					if (progress.failed) {
+						failed = true;
+					}
 					count += 100;
 					total += 100;
 				} else if (!isNaN(progress.count) && !isNaN(progress.total)) {
@@ -50,7 +67,7 @@
 
 			// create the progress element if not created already
 			if (progressEl.length === 0 && !finished) {
-				progressEl = $('<div class="progress"><span class="bar" style="width:0"></span></div>').appendTo($this);
+				progressEl = $('<div class="progress"><div class="meter"><span class="bar" style="width:0"></span></div></div>').appendTo($this);
 			} else {
 				// stop any animations currently happening
 				$('.progress, .progress .bar', $this).stop();
@@ -82,26 +99,21 @@
 
 			// if everything is finished then start fading away
 			if (finished) {
+
+				if (failed) {
+					$('.meter', progressEl).addClass('red');
+				}
+
 				tracker = {};
 				fadingAway = true;
-				// fading away consists of several asynchronous steps, animate width, fade away, then remove
-				// but that progress can be interrupted if fadingAway flag becomes false
-				// which could happen if a new promise was tracked before the steps are finished
-				// if that happens, stop processing additional steps
-				bar.animate({
-					width : '100%'
-				}, 100, null, function() {
-					setTimeout(function(){
-						if (fadingAway) {
-							$('.progress', $this).fadeOut(function() {
-								if (fadingAway) {
-									$('.progress', $this).remove();
-									fadingAway = false;
-								}
-							});
-						}
-					}, 100);
-				});
+
+				if (failed) {
+					setTimeout(fadeAway, 2000);
+				} else {
+					bar.animate({
+						width : '100%'
+					}, 100, null, fadeAway);
+				}
 			} else {
 				// animate the bar's width to the progress percent
 				bar.animate({
@@ -135,7 +147,8 @@
 			promise.fail(function() {
 				progress.failed = true;
 			});
-			promise.always(function() {
+			promise.always(function(message) {
+				progress.message = message;
 				progress.finished = true;
 				update();
 			});
