@@ -1,5 +1,5 @@
 var meta = {
-    imagePrefix: '/images/PlanetCute PNG/',
+    imagePrefix: '/resources/img/PlanetCute/',
     tileWidth: 8,
     tileDepth: 8,
     tileHeight: 8,
@@ -7,6 +7,13 @@ var meta = {
     blockWidth: 100,
     blockHeight: 41,
     blocks: {
+        '-1': {
+            name : 'Selector',
+            shadow : false,
+            states : [{
+                imageSrc: 'Selector.png'
+            }]
+        },
         1: {
             name: 'Plain',
             shadow: true,
@@ -203,6 +210,25 @@ var meta = {
                 imageSrc: 'Gem Orange.png',
                 edgeHeights: [1, 1, 1, 1]
             }]
+        },
+        18: {
+            name: 'Character',
+            states: [{
+                name: 'Boy',
+                imageSrc: 'Character Boy.png'
+            }, {
+                name: 'Cat Girl',
+                imageSrc: 'Character Cat Girl.png'
+            }, {
+                name: 'Horn Girl',
+                imageSrc: 'Character Horn Girl.png'
+            }, {
+                name: 'Pink Girl',
+                imageSrc: 'Character Pink Girl.png'
+            }, {
+                name: 'Princess Girl',
+                imageSrc: 'Character Princess Girl.png'
+            }]
         }
     },
     shadows: [{
@@ -212,7 +238,7 @@ var meta = {
     }, {
         imageSrc: 'Shadow South West.png',
         placed: [1, -1, 1],
-        none: [[0, 1, 1], [0, 0, 1]]
+        none: [[0, 1, 1], [0, 0, 1], [0, -1, 1]]
     }, {
         imageSrc: 'Shadow West.png',
         placed: [0, -1, 1],
@@ -220,7 +246,7 @@ var meta = {
     }, {
         imageSrc: 'Shadow North West.png',
         placed: [-1, -1, 1],
-        none: [[-1, 0, 1], [0, 0, 1]]
+        none: [[-1, 0, 1], [0, 0, 1], [0, -1, 1]]
     }, {
         imageSrc: 'Shadow North.png',
         placed: [-1, 0, 1],
