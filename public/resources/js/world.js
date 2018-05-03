@@ -1,42 +1,6 @@
 $(function() {
     "use strict";
 
-    var socket, world, position = [0, 0], lastPoint, start, container = $('body'), tiles = $('<div></div>').css({
-        position: 'absolute',
-        top: '50%',
-        left: '50%'
-    }).appendTo(container);
-
-    container.bind({
-        'mousedown touchstart': function(e) {
-            e.preventDefault();
-            if (e.touches && e.touches.length > 0) {
-                e = e.touches[0];
-            }
-            lastPoint = [e.pageX, e.pageY];
-        },
-        'mouseup touchend' : function(e) {
-            e.preventDefault();
-            lastPoint = null;
-        },
-        'mousemove touchmove': function(e) {
-            e.preventDefault();
-            if (e.touches && e.touches.length > 0) {
-                e = e.touches[0];
-            }
-            if (lastPoint) {
-                var newPoint = [e.pageX, e.pageY];
-                position[0] += newPoint[0] - lastPoint[0];
-                position[1] += newPoint[1] - lastPoint[1];
-                lastPoint = newPoint;
-                tiles.css({
-                    marginLeft: position[0] + 'px',
-                    marginTop: position[1] + 'px'
-                });
-            }
-        }
-    });
-
     function initTile(tz, tx, data) {
         var tile = createTile(tile, data).css({
             position: 'absolute',
@@ -126,18 +90,65 @@ $(function() {
     }
 
     function init() {
-        socket = io();
+        var position = [0, 0], lastPoint;
+        var container = $('<div></div>').css({
+            position: 'fixed',
+            top: 0, left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
+        })
+        .appendTo('body')
+        .bind({
+            'mousedown touchstart': function(e) {
+                e.preventDefault();
+                if (e.touches && e.touches.length > 0) {
+                    e = e.touches[0];
+                }
+                lastPoint = [e.pageX, e.pageY];
+            },
+            'mouseup touchend' : function(e) {
+                e.preventDefault();
+                lastPoint = null;
+            },
+            'mousemove touchmove': function(e) {
+                e.preventDefault();
+                if (e.touches && e.touches.length > 0) {
+                    e = e.touches[0];
+                }
+                if (lastPoint) {
+                    var newPoint = [e.pageX, e.pageY];
+                    position[0] += newPoint[0] - lastPoint[0];
+                    position[1] += newPoint[1] - lastPoint[1];
+                    lastPoint = newPoint;
+                    tiles.css({
+                        marginLeft: position[0] + 'px',
+                        marginTop: position[1] + 'px'
+                    });
+                }
+            }
+        });
+
+        tiles = $('<div></div>').css({
+            position: 'absolute',
+            top: '50%',
+            left: '50%'
+        }).appendTo(container);
+
+        var socket = io();
         socket.on('tile init', initTile);
-        for (var i=-1; i<=1; i++) {
-            for (var j=-1; j<=1; j++) {
+        for (var i=-1; i<=0; i++) {
+            for (var j=-1; j<=0; j++) {
                 socket.emit('watch', i, j);
             }
         }
     }
 
+    var world, tiles;
+
     $.ajax('/resources/content/world.json').done(function(response) {
         world = response;
-        container.progressbar(loadImages(getImageSrcArray()).then(function(images) {
+        $('body').progressbar(loadImages(getImageSrcArray()).then(function(images) {
             world.images = images;
             init();
             return 'Finished!';
