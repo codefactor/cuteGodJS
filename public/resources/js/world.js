@@ -1,23 +1,46 @@
 $(function() {
     "use strict";
 
-    var socket, world, container = $('body');
+    var socket, world, position = [0, 0], lastPoint, start, container = $('body'), tiles = $('<div></div>').css({
+        position: 'absolute',
+        top: '50%',
+        left: '50%'
+    }).appendTo(container);
 
-    function initTile(tile, data) {
-        var tiles = $('<div></div>').css({
-            position: 'relative'
-        }).appendTo(container);
+    container.bind({
+        'mousedown touchstart': function(e) {
+            if (e.touches && e.touches.length > 0) {
+                e = e.touches[0];
+            }
+            lastPoint = [e.pageX, e.pageY];
+        },
+        'mouseup touchend' : function(e) {
+            lastPoint = null;
+        },
+        'mousemove touchmove': function(e) {
+            if (e.touches && e.touches.length > 0) {
+                e = e.touches[0];
+            }
+            if (lastPoint) {
+                var newPoint = [e.pageX, e.pageY];
+                position[0] += newPoint[0] - lastPoint[0];
+                position[1] += newPoint[1] - lastPoint[1];
+                lastPoint = newPoint;
+                tiles.css({
+                    marginLeft: position[0] + 'px',
+                    marginTop: position[1] + 'px'
+                });
+            }
+        }
+    });
+
+    function initTile(tz, tx, data) {
         var tile = createTile(tile, data).css({
             position: 'absolute',
-            top: 0, left: 0
+            top: tz * world.tileDepth * world.blockDepth - world.blockHeight * world.tileHeight + 'px',
+            left: tx * world.tileWidth * world.blockWidth + 'px'
         });
         tile.appendTo(tiles);
-        var tile2 = createTile(tile, data).css({
-            position: 'absolute',
-            top: (world.tileDepth * world.blockDepth) + 'px',
-            left: 0
-        });
-        tile2.appendTo(tiles);
     }
 
     function createTile(tile, data) {
@@ -49,7 +72,7 @@ $(function() {
                 }
             }
         }
-        return $('<div></div>').append(canvas);
+        return canvas;
     }
 
     function loadImages(srcArray) {
@@ -102,7 +125,11 @@ $(function() {
     function init() {
         socket = io();
         socket.on('tile init', initTile);
-        socket.emit('watch', '0,0');
+        for (var i=-1; i<=1; i++) {
+            for (var j=-1; j<=1; j++) {
+                socket.emit('watch', i, j);
+            }
+        }
     }
 
     $.ajax('/resources/content/world.json').done(function(response) {
