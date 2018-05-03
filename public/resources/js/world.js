@@ -9,15 +9,18 @@ $(function() {
 
     container.bind({
         'mousedown touchstart': function(e) {
+            e.preventDefault();
             if (e.touches && e.touches.length > 0) {
                 e = e.touches[0];
             }
             lastPoint = [e.pageX, e.pageY];
         },
         'mouseup touchend' : function(e) {
+            e.preventDefault();
             lastPoint = null;
         },
         'mousemove touchmove': function(e) {
+            e.preventDefault();
             if (e.touches && e.touches.length > 0) {
                 e = e.touches[0];
             }
