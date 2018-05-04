@@ -2,18 +2,19 @@ $(function() {
     "use strict";
 
     function initTile(tz, tx, data) {
-        var tile = createTile(tile, data).css({
+        createTile(tz, tx, data).css({
             position: 'absolute',
-            top: tz * world.tileDepth * world.blockDepth - world.blockHeight * world.tileHeight + 'px',
+            zIndex: tz,
+            top: tz * world.tileDepth * world.blockDepth - world.offsetY + 'px',
             left: tx * world.tileWidth * world.blockWidth + 'px'
-        });
-        tile.appendTo(tiles);
+        }).appendTo(tiles);
     }
 
-    function createTile(tile, data) {
+    function createTile(tz, tx, data) {
         var canvas = $('<canvas></canvas>').attr({
-            width: (world.tileWidth * world.blockWidth),
-            height: (world.tileDepth * world.blockDepth + world.blockHeight * world.tileHeight)
+            id: 'tile-'+tz+'-'+tx,
+            width: world.tileWidth * world.blockWidth,
+            height: world.tileDepth * world.blockDepth + world.tileOverlapY
         });
         var ctx = canvas[0].getContext('2d');
         for (var bz=0; bz<world.tileDepth; bz++) {
@@ -34,12 +35,59 @@ $(function() {
                     var image = state && world.images[world.imagePrefix + state.imageSrc];
                     if (!image) continue;
                     var lEdge = bx * world.blockWidth;
-                    var bEdge = (bz+1) * world.blockDepth + (world.tileHeight-by) * world.blockHeight;
+                    var bEdge = (bz+1) * world.blockDepth + (world.tileHeight-by+1) * world.blockHeight;
                     ctx.drawImage(image, lEdge, bEdge - image.height);
                 }
             }
         }
         return canvas;
+    }
+
+    function updateVisibleTiles() {
+        var visibleTiles = getVisibleTiles();
+        var needsWatch = {};
+        visibleTiles.forEach(function(tile) {
+            var id = tile[0]+','+tile[1];
+            needsWatch[id] = tile;
+            if (!watching[id]) {
+                socket.emit('start watching', tile[0], tile[1]);
+            }
+        });
+        var stopWatching = [];
+        for (var id in watching) {
+            if (!needsWatch[id]) {
+                var tile = watching[id];
+                socket.emit('stop watching', tile[0], tile[1]);
+                $('#tile-'+id).remove();
+            }
+        }
+        watching = needsWatch;
+    }
+
+    function getVisibleTiles() {
+        var cWidth = container.width();
+        var cHeight = container.height();
+        var tWidth = world.tileWidth * world.blockWidth;
+        var tHeight = world.tileDepth * world.blockDepth;
+        var left = Math.floor((-cWidth / 2 - position[0]) / tWidth);
+        var top = Math.floor((-cHeight / 2 - position[1] + world.offsetY) / tHeight) - 1;
+        var width = Math.ceil(cWidth / tWidth) + 1;
+        var height = Math.ceil((cHeight + world.tileOverlapY) / tHeight) + 1;
+        var tiles = [];
+        for (var i=0; i<height; i++) {
+            for (var j=0; j<width; j++) {
+                tiles.push([top+i, left+j]);
+            }
+        }
+        return tiles;
+    }
+
+    function setPosition(position) {
+        tiles.css({
+            marginLeft: position[0] + 'px',
+            marginTop: position[1] + 'px'
+        });
+        updateVisibleTiles();
     }
 
     function loadImages(srcArray) {
@@ -90,8 +138,8 @@ $(function() {
     }
 
     function init() {
-        var position = [0, 0], lastPoint;
-        var container = $('<div></div>').css({
+        var lastPoint;
+        container = $('<div></div>').css({
             position: 'fixed',
             top: 0, left: 0,
             width: '100%',
@@ -121,10 +169,7 @@ $(function() {
                     position[0] += newPoint[0] - lastPoint[0];
                     position[1] += newPoint[1] - lastPoint[1];
                     lastPoint = newPoint;
-                    tiles.css({
-                        marginLeft: position[0] + 'px',
-                        marginTop: position[1] + 'px'
-                    });
+                    setPosition(position);
                 }
             }
         });
@@ -135,21 +180,21 @@ $(function() {
             left: '50%'
         }).appendTo(container);
 
-        var socket = io();
+        socket = io();
         socket.on('tile init', initTile);
-        for (var i=-1; i<=0; i++) {
-            for (var j=-1; j<=0; j++) {
-                socket.emit('watch', i, j);
-            }
-        }
+
+        $(window).resize(updateVisibleTiles);
+        updateVisibleTiles();
     }
 
-    var world, tiles;
+    var socket, world, tiles, container, watching = {}, position = [0, 0];
 
     $.ajax('/resources/content/world.json').done(function(response) {
         world = response;
         $('body').progressbar(loadImages(getImageSrcArray()).then(function(images) {
             world.images = images;
+            world.offsetY = world.blockHeight * (world.tileHeight+1);
+            world.tileOverlapY = world.blockHeight * (world.tileHeight+1);
             init();
             return 'Finished!';
         }));
