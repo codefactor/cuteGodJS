@@ -229,6 +229,16 @@
                 "name": "Princess Girl",
                 "imageSrc": "Character Princess Girl.png"
             }]
+        },
+        "19": {
+            "name": "Chest",
+            "states": [{
+                "name": "Closed",
+                "imageSrc": "Chest Closed.png"
+            }, {
+                "name": "Open",
+                "imageSrc": "Chest Open.png"
+            }]
         }
     },
     "shadows": [{
