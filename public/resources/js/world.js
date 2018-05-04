@@ -46,13 +46,16 @@ $(function() {
     function updateVisibleTiles() {
         var visibleTiles = getVisibleTiles();
         var needsWatch = {};
-        visibleTiles.forEach(function(tile) {
-            var id = tile[0]+','+tile[1];
-            needsWatch[id] = tile;
-            if (!watching[id]) {
-                socket.emit('start watching', tile[0], tile[1]);
+        for (var zCount=0; zCount < visibleTiles.zCount; zCount++) {
+            for (var xCount=0; xCount < visibleTiles.xCount; xCount++) {
+                var tile = [zCount + visibleTiles.tz, xCount + visibleTiles.tx];
+                var id = tile[0] + '-' + tile[1];
+                needsWatch[id] = tile;
+                if (!watching[id]) {
+                    socket.emit('start watching', tile[0], tile[1]);
+                }
             }
-        });
+        }
         var stopWatching = [];
         for (var id in watching) {
             if (!needsWatch[id]) {
@@ -69,17 +72,12 @@ $(function() {
         var cHeight = container.height();
         var tWidth = world.tileWidth * world.blockWidth;
         var tHeight = world.tileDepth * world.blockDepth;
-        var left = Math.floor((-cWidth / 2 - position[0]) / tWidth);
-        var top = Math.floor((-cHeight / 2 - position[1] + world.offsetY) / tHeight) - 1;
-        var width = Math.ceil(cWidth / tWidth) + 1;
-        var height = Math.ceil((cHeight + world.tileOverlapY) / tHeight) + 1;
-        var tiles = [];
-        for (var i=0; i<height; i++) {
-            for (var j=0; j<width; j++) {
-                tiles.push([top+i, left+j]);
-            }
-        }
-        return tiles;
+        return {
+            tz: Math.floor((-cHeight / 2 - position[1] + world.offsetY) / tHeight) - 1,
+            tx: Math.floor((-cWidth / 2 - position[0]) / tWidth),
+            zCount: Math.ceil((cHeight + world.tileOverlapY) / tHeight) + 1,
+            xCount: Math.ceil(cWidth / tWidth) + 1
+        };
     }
 
     function setPosition(position) {
