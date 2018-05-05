@@ -1,8 +1,8 @@
 {
     "imagePrefix": "/resources/img/PlanetCute/",
-    "tileWidth": 8,
-    "tileDepth": 8,
-    "tileHeight": 8,
+    "tileWidth": 16,
+    "tileDepth": 16,
+    "tileHeight": 16,
     "blockDepth": 80,
     "blockWidth": 100,
     "blockHeight": 41,
