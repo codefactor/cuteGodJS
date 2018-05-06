@@ -11,6 +11,7 @@ $(function() {
     }
 
     function createTile(tz, tx, data) {
+        console.log(data);
         var canvas = $('<canvas></canvas>').attr({
             id: 'tile-'+tz+'-'+tx,
             width: world.tileWidth * world.blockWidth,
@@ -26,8 +27,10 @@ $(function() {
                 for (var by=0, h=Math.min(world.tileHeight, column.length); by<h; by++) {
                     var block = column[by];
                     var state = 0;
+                    var shadows = [];
                     if ($.isArray(block)) {
                         state = block[1];
+                        shadows = block.slice(2);
                         block = block[0];
                     }
                     block = world.blocks[block];
@@ -37,6 +40,13 @@ $(function() {
                     var lEdge = bx * world.blockWidth;
                     var bEdge = (bz+1) * world.blockDepth + (world.tileHeight-by+1) * world.blockHeight;
                     ctx.drawImage(image, lEdge, bEdge - image.height);
+                    shadows.forEach(function(shadow) {
+                        shadow = world.shadows[shadow];
+                        shadow = shadow && world.images[world.imagePrefix + shadow.imageSrc];
+                        if (shadow) {
+                            ctx.drawImage(shadow, lEdge, bEdge - shadow.height);
+                        }
+                    });
                 }
             }
         }
